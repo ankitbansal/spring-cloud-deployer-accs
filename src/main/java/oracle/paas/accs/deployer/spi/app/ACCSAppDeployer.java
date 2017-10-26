@@ -6,6 +6,11 @@ import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.cloud.deployer.spi.core.RuntimeEnvironmentInfo;
 
 public class ACCSAppDeployer implements AppDeployer {
+    private RuntimeEnvironmentInfo runtimeEnvironmentInfo;
+
+    public ACCSAppDeployer(RuntimeEnvironmentInfo runtimeEnvironmentInfo) {
+        this.runtimeEnvironmentInfo = runtimeEnvironmentInfo;
+    }
 
     public String deploy(AppDeploymentRequest appDeploymentRequest) {
         System.out.println(String.format("Entered deploy: Deploying AppDeploymentRequest: AppDefinition = {%s}, Resource = {%s}, Deployment Properties = {%s}",
@@ -25,6 +30,6 @@ public class ACCSAppDeployer implements AppDeployer {
     }
 
     public RuntimeEnvironmentInfo environmentInfo() {
-        return null;
+        return runtimeEnvironmentInfo;
     }
 }

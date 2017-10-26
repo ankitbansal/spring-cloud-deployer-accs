@@ -10,7 +10,7 @@
     <description>ACCS Spring Cloud Deployer</description>
 
     <properties>
-        <spring-cloud-deployer-spi.version>1.2.2.RELEASE</spring-cloud-deployer-spi.version>
+        <spring-cloud-deployer-spi.version>1.3.0.M1</spring-cloud-deployer-spi.version>
         <spring-boot.version>1.5.7.RELEASE</spring-boot.version>
 
     </properties>
@@ -35,4 +35,21 @@
             <version>${spring-cloud-deployer-spi.version}</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation><activeByDefault>true</activeByDefault></activation>
+            <repositories>
+                <repository>
+                    <id>spring-milestones</id>
+                    <name>Spring Milestones</name>
+                    <url>http://repo.spring.io/milestone</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
 </project>

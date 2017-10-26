@@ -6,6 +6,13 @@ import org.springframework.cloud.deployer.spi.task.TaskLauncher;
 import org.springframework.cloud.deployer.spi.task.TaskStatus;
 
 public class ACCSTaskLauncher implements TaskLauncher {
+
+    private RuntimeEnvironmentInfo runtimeEnvironmentInfo;
+
+    public ACCSTaskLauncher(RuntimeEnvironmentInfo runtimeEnvironmentInfo) {
+        this.runtimeEnvironmentInfo = runtimeEnvironmentInfo;
+    }
+
     public String launch(AppDeploymentRequest appDeploymentRequest) {
         return null;
     }
@@ -27,6 +34,6 @@ public class ACCSTaskLauncher implements TaskLauncher {
     }
 
     public RuntimeEnvironmentInfo environmentInfo() {
-        return null;
+        return runtimeEnvironmentInfo;
     }
 }
