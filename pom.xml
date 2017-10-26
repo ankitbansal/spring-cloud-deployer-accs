@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spring-cloud-deployer-cloudfoundry</artifactId>
+    <artifactId>spring-cloud-deployer-accs</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <groupId>oracle.paas.accs</groupId>
     <packaging>jar</packaging>
@@ -22,6 +22,11 @@
             <version>${spring-boot.version}</version>
             <type>pom</type>
             <scope>import</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <dependency>
