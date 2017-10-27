@@ -49,12 +49,12 @@ public class Application {
         return archiveFileName;
     }
 
-    public static Application from(AppDeploymentRequest appDeploymentRequest, String name, String storageFilename) {
+    public static Application from(AppDeploymentRequest appDeploymentRequest, String name, String storageFilename, String jarName) {
         Application  application = new Application();
         application.name = ACCSUtil.getSanitizedApplicationName(name);
         application.notes = "App created using accs dataflow server";
         application.runtime = "Java";
-        application.manifest = Manifest.from(appDeploymentRequest, name);
+        application.manifest = Manifest.from(appDeploymentRequest, jarName);
         application.deployment = Deployment.from(appDeploymentRequest);
         application.archiveURL = "_apaas/" +storageFilename;
         application.archiveFileName = storageFilename;
@@ -75,10 +75,10 @@ public class Application {
         public String getType() {
             return type;
         }
-        private static Manifest from(AppDeploymentRequest appDeploymentRequest, String name) {
+        private static Manifest from(AppDeploymentRequest appDeploymentRequest, String jarName) {
             Manifest manifest = new Manifest();
             manifest.type = "worker";
-            manifest.command = "java -jar " +name;
+            manifest.command = "java -jar " +jarName;
             return manifest;
         }
     }

@@ -3,6 +3,7 @@ package oracle.paas.accs.deployer.spi.app;
 import oracle.paas.accs.deployer.spi.client.ACCSClient;
 import oracle.paas.accs.deployer.spi.client.Application;
 import oracle.paas.accs.deployer.spi.client.StorageClient;
+import oracle.paas.accs.deployer.spi.util.ACCSUtil;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.app.AppStatus;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
@@ -54,13 +55,14 @@ public class ACCSAppDeployer implements AppDeployer {
         }
 
         if(file != null) {
+            File zipFile = ACCSUtil.convertToZipFile(file);
+            System.out.println("Created zip file : " +zipFile.getAbsolutePath());
             StorageClient storageClient = new StorageClient();
-            storageClient.pushFileToStorage(file);
+            storageClient.pushFileToStorage(zipFile);
 
             ACCSClient client = new ACCSClient();
-            client.createApplication(Application.from(appDeploymentRequest, deploymentId, file.getName()));
+            client.createApplication(Application.from(appDeploymentRequest, deploymentId, zipFile.getName(), file.getName()));
         }
-        //deployApp
     }
 
     private String deploymentId(AppDeploymentRequest request) {
