@@ -15,17 +15,18 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 
 public class StorageClient {
-    private String username = "StorageEval03admin.Storageadmin";
+    private String username = "StorageEval02admin.Storageadmin";
     private String password = "Welcome1";
-    private String uri = "https://storage.oraclecorp.com/v1/Storage-StorageEval03admin/_apaas";
+    private String uri = "https://storage.oraclecorp.com/v1/Storage-StorageEval02admin/_apaas";
 
-    public void pushFileToStorage(File file) {
+    public String pushFileToStorage(File file) {
         System.out.println("File Path :" +file.getAbsolutePath());
         System.out.println("File Name :" +file.getName());
 
         ClientConfig config = new ClientConfig();
         Client client = ClientBuilder.newClient(config).register(MultiPartFeature.class);
-        WebTarget webTarget = client.target(uri + "/" +file.getName());
+        String storagePath = uri + "/" + file.getName();
+        WebTarget webTarget = client.target(storagePath);
 
         MultiPart multiPart = new MultiPart();
         multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
@@ -39,10 +40,11 @@ public class StorageClient {
 
         System.out.println(response.getStatus() + " "
                 + response.getStatusInfo() + " " + response);
+        return storagePath;
     }
 
 
-    public  String authHeader() {
+    private  String authHeader() {
         byte[] encodedBytes = Base64.encodeBase64((username + ":" + password).getBytes());
         return "Basic " + new String(encodedBytes);
     }

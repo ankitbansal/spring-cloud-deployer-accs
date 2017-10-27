@@ -1,5 +1,7 @@
 package oracle.paas.accs.deployer.spi.app;
 
+import oracle.paas.accs.deployer.spi.client.ACCSClient;
+import oracle.paas.accs.deployer.spi.client.Application;
 import oracle.paas.accs.deployer.spi.client.StorageClient;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.app.AppStatus;
@@ -23,7 +25,7 @@ public class ACCSAppDeployer implements AppDeployer {
         String deploymentId = deploymentId(appDeploymentRequest);
         System.out.println(String.format("deploy: Getting Status for Deployment Id = {%s}", deploymentId));
 
-        deployApplication(appDeploymentRequest);
+        deployApplication(appDeploymentRequest, deploymentId);
 
 
         System.out.println(String.format("Exiting deploy().  Deployment Id = {%s}", deploymentId));
@@ -42,7 +44,7 @@ public class ACCSAppDeployer implements AppDeployer {
         return runtimeEnvironmentInfo;
     }
 
-    private void deployApplication(AppDeploymentRequest appDeploymentRequest) {
+    private void deployApplication(AppDeploymentRequest appDeploymentRequest, String deploymentId) {
         File file = null;
         try {
             file = appDeploymentRequest.getResource().getFile();
@@ -54,6 +56,9 @@ public class ACCSAppDeployer implements AppDeployer {
         if(file != null) {
             StorageClient storageClient = new StorageClient();
             storageClient.pushFileToStorage(file);
+
+            ACCSClient client = new ACCSClient();
+            client.createApplication(Application.from(appDeploymentRequest, deploymentId, file.getName()));
         }
         //deployApp
     }

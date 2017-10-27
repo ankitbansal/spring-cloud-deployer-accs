@@ -2,7 +2,7 @@ package oracle.paas.accs.deployer.spi.util;
 
 import oracle.paas.accs.deployer.spi.app.ACCSAppDeployer;
 import oracle.paas.accs.deployer.spi.app.ACCSTaskLauncher;
-import oracle.paas.accs.deployer.spi.client.ACCSClient;
+import oracle.paas.accs.deployer.spi.client.ACCSInfo;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -20,7 +20,7 @@ import org.springframework.core.Ordered;
 public class ACCSAutoConfiguration {
 
     private RuntimeEnvironmentInfo runtime(Class spiClass, Class implementationClass) {
-        ACCSClient client = new ACCSClient();
+        ACCSInfo client = new ACCSInfo();
         return new RuntimeEnvironmentInfo.Builder()
                 .implementationName(implementationClass.getSimpleName())
                 .spiClass(spiClass)
