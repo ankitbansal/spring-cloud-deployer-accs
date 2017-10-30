@@ -5,7 +5,7 @@ public class ACCSInfo {
     private String version = "17.4.6";
     private String apiVersion = "17.4.6";
     private String hostVersion = "17.4.6";
-    private String endPoint = "http://slc12noy.us.oracle.com:8103";
+    private String endPoint = "http://slc06cig.us.oracle.com:7001";
 
     public String getPlatformType() {
         return platformType;

@@ -22,8 +22,8 @@ import static oracle.paas.accs.deployer.spi.util.GsonUtil.gson;
 public class ACCSClient {
     private final static String username = "weblogic";
     private final static String password = "welcome1";
-    private final static String identityDomain = "psmdemo6";
-    public final static String uri="http://slc12noy.us.oracle.com:8103/paas/service/apaas/api/v1.1/apps";
+    private final static String identityDomain = "apaasuser";
+    public final static String uri="http://slc06cig.us.oracle.com:7001/paas/service/apaas/api/v1.1/apps";
 
     public void createApplication(Application application) {
         System.out.println("Inside createApplication");
