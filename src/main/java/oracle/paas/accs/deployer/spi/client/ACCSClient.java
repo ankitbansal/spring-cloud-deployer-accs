@@ -1,6 +1,7 @@
 package oracle.paas.accs.deployer.spi.client;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import oracle.paas.accs.deployer.spi.util.GsonUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.glassfish.jersey.client.ClientConfig;
@@ -23,7 +24,7 @@ public class ACCSClient {
     private final static String username = "weblogic";
     private final static String password = "welcome1";
     private final static String identityDomain = "apaasuser";
-    public final static String uri="http://slc06cig.us.oracle.com:7001/paas/service/apaas/api/v1.1/apps";
+    public final static String uri="http://slc11woo.us.oracle.com:8103/paas/service/apaas/api/v1.1/apps";
 
     public void createApplication(Application application) {
         System.out.println("Inside createApplication");
@@ -79,6 +80,29 @@ public class ACCSClient {
                 System.out.println("Exception while cleaning up" + ex.getMessage());
             }
         }
+    }
+
+    public ApplicationStatus getApplication(String appName) {
+        System.out.println("Inside getApplcation : " +appName);
+        Client client = getClient();
+        Response response = null;
+
+        WebTarget webTarget = client.target(uri + "/" + identityDomain + "/" + appName);
+        response = webTarget.request(MediaType.APPLICATION_JSON_TYPE)
+                .header("Authorization", authHeader())
+                .header("X-ID-TENANT-NAME", identityDomain)
+                .get(Response.class);
+
+        System.out.println(response.getStatus() + " "
+                + response.getStatusInfo() + " " + response);
+        if (!response.getStatusInfo().toString().equals(Response.Status.OK.toString())) {
+            System.out.println("Unable to retrieve app details. Error Response : " + response);
+
+        } else {
+            String output = response.readEntity(String.class);
+            return GsonUtil.gson().fromJson(output, ApplicationStatus.class);
+        }
+        return null;
     }
 
     private  String authHeader() {

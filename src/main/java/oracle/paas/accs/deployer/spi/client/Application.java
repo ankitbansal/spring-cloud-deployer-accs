@@ -1,6 +1,4 @@
 package oracle.paas.accs.deployer.spi.client;
-
-import oracle.paas.accs.deployer.spi.util.ACCSUtil;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 
 import java.util.LinkedHashMap;
@@ -51,7 +49,7 @@ public class Application {
 
     public static Application from(AppDeploymentRequest appDeploymentRequest, String name, String storageFilename, String jarName) {
         Application  application = new Application();
-        application.name = ACCSUtil.getSanitizedApplicationName(name);
+        application.name = name;
         application.notes = "App created using accs dataflow server";
         application.runtime = "Java";
         application.manifest = Manifest.from(appDeploymentRequest, jarName);
@@ -78,7 +76,9 @@ public class Application {
         private static Manifest from(AppDeploymentRequest appDeploymentRequest, String jarName) {
             Manifest manifest = new Manifest();
             manifest.type = "worker";
-            manifest.command = "java -jar " +jarName;
+            manifest.command = "java -jar " +jarName + " " +
+                    "--spring.cloud.stream.kafka.binder.brokers=10.88.142.182:6667 " +
+                    "--spring.cloud.stream.kafka.binder.zkNodes=10.88.142.182:2181";
             return manifest;
         }
     }

@@ -43,6 +43,7 @@ public class ACCSUtil {
                 throw new RuntimeException(e);
             }finally {
                 try {
+                    zos.finish();
                     zos.close();
                 } catch (Exception e) {
                 }
