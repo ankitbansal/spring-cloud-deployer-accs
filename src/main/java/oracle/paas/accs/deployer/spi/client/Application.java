@@ -1,7 +1,10 @@
 package oracle.paas.accs.deployer.spi.client;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 
+import javax.imageio.spi.ServiceRegistry;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Application {
@@ -86,6 +89,7 @@ public class Application {
     static class Deployment {
         private Integer instances;
         private String memory;
+        private List<ServiceBinding> services = new ArrayList<ServiceBinding>();
         private Map<String, String> environment = new LinkedHashMap<String, String>();
 
         public Integer getInstances() {
@@ -100,13 +104,36 @@ public class Application {
             return environment;
         }
 
+        public List<ServiceBinding> getServices() {
+            return services;
+        }
+
         private static Deployment from(AppDeploymentRequest appDeploymentRequest) {
             Deployment deployment = new Deployment();
             deployment.memory = "1G";
             deployment.instances = 1;
+
+            ServiceBinding serviceBinding = new ServiceBinding();
+            serviceBinding.type = "OEHPCS";
+            serviceBinding.name = "Ankit1";
+            deployment.services.add(serviceBinding);
             return deployment;
         }
+
+        static  class ServiceBinding {
+            private String name;
+            private String type;
+
+            public String getName() {
+                return name;
+            }
+
+            public String getType() {
+                return type;
+            }
+        }
     }
+
 }
 
 

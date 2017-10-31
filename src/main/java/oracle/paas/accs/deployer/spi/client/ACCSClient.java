@@ -48,7 +48,7 @@ public class ACCSClient {
                 uploadform.bodyPart(new FileDataBodyPart("manifest", manifestFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
             }
             if (application.getDeployment() != null) {
-                System.out.println("Upload deployment.json file.");
+                System.out.println("Upload deployment.json file. : " +gson().toJson(application.getDeployment()));
                 File deploymentFile = new File("deployment.json");
                 FileUtils.writeStringToFile(deploymentFile, gson().toJson(application.getDeployment()));
                 uploadform.bodyPart(new FileDataBodyPart("deployment", deploymentFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
