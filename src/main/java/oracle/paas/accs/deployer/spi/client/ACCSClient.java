@@ -24,6 +24,7 @@ public class ACCSClient {
     private final static String username = "ramya.paruchuri@oracle.com";
     private final static String password = "Welc0me1#";
     private final static String identityDomain = "idcs-eedbb1bbfac84ec090e78e5b1079daab";
+//    private final static String identityDomain = "invalid";
     public final static String uri="https://psm.aucom-east-1.c9qa132.oc9qadev.com/paas/service/apaas/api/v1.1/apps";
 
     public void createApplication(Application application) {

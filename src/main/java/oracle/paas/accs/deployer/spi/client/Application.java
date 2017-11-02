@@ -1,7 +1,7 @@
 package oracle.paas.accs.deployer.spi.client;
+import oracle.paas.accs.deployer.spi.app.CommandBuilder;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 
-import javax.imageio.spi.ServiceRegistry;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,13 +50,14 @@ public class Application {
         return archiveFileName;
     }
 
-    public static Application from(AppDeploymentRequest appDeploymentRequest, String name, String storageFilename, String jarName) {
+    public static Application from(AppDeploymentRequest appDeploymentRequest, String name, String storageFilename,
+                                   String jarName, Map<String, String> envVariables) {
         Application  application = new Application();
         application.name = name;
         application.notes = "App created using accs dataflow server";
         application.runtime = "Java";
         application.manifest = Manifest.from(appDeploymentRequest, jarName);
-        application.deployment = Deployment.from(appDeploymentRequest);
+        application.deployment = Deployment.from(appDeploymentRequest, envVariables);
         application.archiveURL = "_apaas/" +storageFilename;
         application.archiveFileName = storageFilename;
         application.subscription = "HOURLY";
@@ -79,13 +80,7 @@ public class Application {
         private static Manifest from(AppDeploymentRequest appDeploymentRequest, String jarName) {
             Manifest manifest = new Manifest();
             manifest.type = "web";
-            Map<String, String> properties = appDeploymentRequest.getDefinition().getProperties();
-            String streamGroup = properties.get("spring.cloud.dataflow.stream.name");
-            manifest.command = "java -jar " +jarName + " " +
-                    "--spring.cloud.stream.kafka.binder.brokers=10.252.239.69:6667 " +
-                    "--spring.cloud.stream.kafka.binder.zkNodes=10.252.239.69:2181 " +
-                    "--spring.cloud.stream.bindings.input.destination=" + streamGroup + " " +
-                    "--spring.cloud.stream.bindings.output.destination=" + streamGroup;;
+            manifest.command = "sh " + jarName;
             return manifest;
         }
     }
@@ -112,7 +107,7 @@ public class Application {
             return services;
         }
 
-        private static Deployment from(AppDeploymentRequest appDeploymentRequest) {
+        private static Deployment from(AppDeploymentRequest appDeploymentRequest, Map<String, String> envVariables) {
             Deployment deployment = new Deployment();
             deployment.memory = "2G";
             deployment.instances = 1;
@@ -121,6 +116,7 @@ public class Application {
             serviceBinding.type = "OEHPCS";
             serviceBinding.name = "Kafka";
             deployment.services.add(serviceBinding);
+            deployment.environment = envVariables;
             return deployment;
         }
 
