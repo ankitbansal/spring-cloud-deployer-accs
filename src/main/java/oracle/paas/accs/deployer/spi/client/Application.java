@@ -59,7 +59,7 @@ public class Application {
         application.deployment = Deployment.from(appDeploymentRequest);
         application.archiveURL = "_apaas/" +storageFilename;
         application.archiveFileName = storageFilename;
-        application.subscription = "MONTHLY";
+        application.subscription = "HOURLY";
 
         return application;
     }
@@ -78,10 +78,14 @@ public class Application {
         }
         private static Manifest from(AppDeploymentRequest appDeploymentRequest, String jarName) {
             Manifest manifest = new Manifest();
-            manifest.type = "worker";
+            manifest.type = "web";
+            Map<String, String> properties = appDeploymentRequest.getDefinition().getProperties();
+            String streamGroup = properties.get("spring.cloud.dataflow.stream.name");
             manifest.command = "java -jar " +jarName + " " +
-                    "--spring.cloud.stream.kafka.binder.brokers=10.88.142.182:6667 " +
-                    "--spring.cloud.stream.kafka.binder.zkNodes=10.88.142.182:2181";
+                    "--spring.cloud.stream.kafka.binder.brokers=10.252.239.69:6667 " +
+                    "--spring.cloud.stream.kafka.binder.zkNodes=10.252.239.69:2181 " +
+                    "--spring.cloud.stream.bindings.input.destination=" + streamGroup + " " +
+                    "--spring.cloud.stream.bindings.output.destination=" + streamGroup;;
             return manifest;
         }
     }
@@ -110,12 +114,12 @@ public class Application {
 
         private static Deployment from(AppDeploymentRequest appDeploymentRequest) {
             Deployment deployment = new Deployment();
-            deployment.memory = "1G";
+            deployment.memory = "2G";
             deployment.instances = 1;
 
             ServiceBinding serviceBinding = new ServiceBinding();
             serviceBinding.type = "OEHPCS";
-            serviceBinding.name = "Ankit1";
+            serviceBinding.name = "Kafka";
             deployment.services.add(serviceBinding);
             return deployment;
         }

@@ -21,10 +21,10 @@ import java.io.InputStream;
 import static oracle.paas.accs.deployer.spi.util.GsonUtil.gson;
 
 public class ACCSClient {
-    private final static String username = "weblogic";
-    private final static String password = "welcome1";
-    private final static String identityDomain = "apaasuser";
-    public final static String uri="http://slc11woo.us.oracle.com:8103/paas/service/apaas/api/v1.1/apps";
+    private final static String username = "ramya.paruchuri@oracle.com";
+    private final static String password = "Welc0me1#";
+    private final static String identityDomain = "idcs-eedbb1bbfac84ec090e78e5b1079daab";
+    public final static String uri="https://psm.aucom-east-1.c9qa132.oc9qadev.com/paas/service/apaas/api/v1.1/apps";
 
     public void createApplication(Application application) {
         System.out.println("Inside createApplication");

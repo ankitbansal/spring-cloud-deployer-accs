@@ -13,9 +13,9 @@ import java.io.File;
 import java.util.Map;
 
 public class StorageClient {
-    private String username = "StorageEval03admin.Storageadmin";
-    private String password = "Welcome1";
-    private String uri = "https://storage.oraclecorp.com/v1/Storage-StorageEval03admin/_apaas";
+    private String username = "ramya.paruchuri@oracle.com";
+    private String password = "Welc0me1#";
+    private String uri = "https://Storage-dea2325c3b1f45f2b9c8861188087b23.dv1.opcstorage.com/v1/Storage-dea2325c3b1f45f2b9c8861188087b23/_apaas";
 
     public String pushFileToStorage(File file) {
         System.out.println("File Path :" +file.getAbsolutePath());
