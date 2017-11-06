@@ -1,5 +1,7 @@
 package oracle.paas.accs.deployer.spi.app;
 
+import oracle.paas.accs.deployer.spi.client.Application;
+import oracle.paas.accs.deployer.spi.util.ACCSUtil;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.util.StringUtils;
 
@@ -9,7 +11,7 @@ import java.util.regex.Pattern;
 
 import static org.springframework.cloud.deployer.spi.app.AppDeployer.GROUP_PROPERTY_KEY;
 
-public class CommandBuilder {
+public class AppBuilder {
 
     private static final String JMX_DEFAULT_DOMAIN_KEY = "spring.jmx.default-domain";
 
@@ -17,35 +19,57 @@ public class CommandBuilder {
 
     public static final String PREFIX = "spring.cloud.deployer.local";
     public static final String DYNAMIC_VALUE_PATTERN = ".*\\$\\{(.*)\\}";
+    private AppDeploymentRequest appDeploymentRequest;
+    private String deploymentId;
+    private Map<String, String> appDefinitionProperties = new HashMap<String, String>();
 
-    public static String buildCommand(AppDeploymentRequest request, String deploymentId, String jarName) {
+    public AppBuilder(AppDeploymentRequest appDeploymentRequest, String deploymentId) {
+
+        this.appDeploymentRequest = appDeploymentRequest;
+        this.deploymentId = deploymentId;
+        initialize();
+    }
+
+    private void initialize() {
+        HashMap<String, String> appDefinitionProperties = new HashMap<String, String>();
+        appDefinitionProperties.putAll(appDeploymentRequest.getDefinition().getProperties());
+        String group = appDeploymentRequest.getDeploymentProperties().get(GROUP_PROPERTY_KEY);
+
+        appDefinitionProperties.put(JMX_DEFAULT_DOMAIN_KEY, deploymentId);
+        if (!appDeploymentRequest.getDefinition().getProperties().containsKey(ENDPOINTS_SHUTDOWN_ENABLED_KEY)) {
+            appDefinitionProperties.put(ENDPOINTS_SHUTDOWN_ENABLED_KEY, "true");
+        }
+        appDefinitionProperties.put("endpoints.jmx.unique-names", "true");
+        appDefinitionProperties.put("spring.cloud.application.guid", "1");
+        if (group != null) {
+            appDefinitionProperties.put("spring.cloud.application.group", group);
+        }
+        appDefinitionProperties.remove("server.port");
+
+    }
+
+    public Application getApplicationData(String zipName) {
+        String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
+        Map<String, String> envVariables = new HashMap<String, String>();
+        application.manifest = Application.Manifest.from(appDeploymentRequest, jarName);
+        application.deployment = Application.Deployment.from(appDeploymentRequest, envVariables);
+        return Application.from(appDeploymentRequest, appName, zipName, ACCSUtil.APP_RUNNER, envVariables);
+    }
+
+    public String buildCommand(String jarName) {
         ArrayList<String> commands = new ArrayList<String>();
         commands.add("java -jar " +jarName);
 
-        addDefinitionProperties(request, deploymentId, commands);
-        addDeploymentProperties(commands, request);
-        commands.addAll(request.getCommandlineArguments());
+        addDefinitionProperties(commands);
+        addDeploymentProperties(commands);
+        commands.addAll(appDeploymentRequest.getCommandlineArguments());
         System.out.println("Java Command = " + StringUtils.collectionToDelimitedString(commands, " "));
         return StringUtils.collectionToDelimitedString(commands, " ");
     }
 
-    private static void addDefinitionProperties(AppDeploymentRequest request, String deploymentId, ArrayList<String> commands) {
-        HashMap<String, String> args = new HashMap<String, String>();
-        args.putAll(request.getDefinition().getProperties());
-        String group = request.getDeploymentProperties().get(GROUP_PROPERTY_KEY);
-
-        args.put(JMX_DEFAULT_DOMAIN_KEY, deploymentId);
-        if (!request.getDefinition().getProperties().containsKey(ENDPOINTS_SHUTDOWN_ENABLED_KEY)) {
-            args.put(ENDPOINTS_SHUTDOWN_ENABLED_KEY, "true");
-        }
-        args.put("endpoints.jmx.unique-names", "true");
-        args.put("spring.cloud.application.guid", "1");
-        if (group != null) {
-            args.put("spring.cloud.application.group", group);
-        }
-        args.remove("server.port");
-        for (String prop : args.keySet()) {
-            addToCommand(commands, args, prop);
+    private void addDefinitionProperties(List<String> commands) {
+        for (String prop : appDefinitionProperties.keySet()) {
+            addToCommand(commands, appDefinitionProperties, prop);
         }
     }
 
@@ -89,8 +113,8 @@ public class CommandBuilder {
             return false;
     }
 
-    private static void addDeploymentProperties(List<String> commands, AppDeploymentRequest request) {
-        Map<String, String> deploymentProperties = request.getDeploymentProperties();
+    private void addDeploymentProperties(List<String> commands) {
+        Map<String, String> deploymentProperties = appDeploymentRequest.getDeploymentProperties();
         for(String prop: deploymentProperties.keySet()) {
             if(prop.equalsIgnoreCase(PREFIX + "." + "javaOpts")) {
                 addJavaOptions(commands, deploymentProperties.get(prop));
@@ -100,7 +124,7 @@ public class CommandBuilder {
         }
     }
 
-    private static void addJavaOptions(List<String> commands, String javaOptsString) {
+    private void addJavaOptions(List<String> commands, String javaOptsString) {
 
         if (javaOptsString != null) {
             String[] javaOpts = StringUtils.tokenizeToStringArray(javaOptsString, " ");

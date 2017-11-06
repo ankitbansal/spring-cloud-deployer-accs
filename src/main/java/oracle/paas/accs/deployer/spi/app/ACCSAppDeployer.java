@@ -1,6 +1,5 @@
 package oracle.paas.accs.deployer.spi.app;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import oracle.paas.accs.deployer.spi.client.ACCSClient;
 import oracle.paas.accs.deployer.spi.client.Application;
 import oracle.paas.accs.deployer.spi.client.ApplicationStatus;
@@ -73,16 +72,17 @@ public class ACCSAppDeployer implements AppDeployer {
         }
 
         if(file != null) {
-            String command = CommandBuilder.buildCommand(appDeploymentRequest, deploymentId, file.getName());
+            AppBuilder appBuilder = new AppBuilder(appDeploymentRequest, deploymentId);
+            String command = appBuilder.buildCommand(file.getName());
+
             File zipFile = ACCSUtil.convertToZipFile(file, command);
             System.out.println("Created zip file : " +zipFile.getAbsolutePath());
             StorageClient storageClient = new StorageClient();
             storageClient.pushFileToStorage(zipFile);
+            Application application = appBuilder.getApplicationData(zipFile.getName());
 
             ACCSClient client = new ACCSClient();
-            String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
-            Map<String, String> envVariables = new HashMap<String, String>();
-            client.createApplication(Application.from(appDeploymentRequest, appName, zipFile.getName(), ACCSUtil.APP_RUNNER, envVariables));
+            client.createApplication(application);
         }
     }
 

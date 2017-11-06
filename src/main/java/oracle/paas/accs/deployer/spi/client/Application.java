@@ -1,5 +1,4 @@
 package oracle.paas.accs.deployer.spi.client;
-import oracle.paas.accs.deployer.spi.app.CommandBuilder;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 
 import java.util.ArrayList;
@@ -56,8 +55,6 @@ public class Application {
         application.name = name;
         application.notes = "App created using accs dataflow server";
         application.runtime = "Java";
-        application.manifest = Manifest.from(appDeploymentRequest, jarName);
-        application.deployment = Deployment.from(appDeploymentRequest, envVariables);
         application.archiveURL = "_apaas/" +storageFilename;
         application.archiveFileName = storageFilename;
         application.subscription = "HOURLY";
