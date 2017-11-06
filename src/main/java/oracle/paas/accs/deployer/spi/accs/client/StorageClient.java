@@ -17,6 +17,12 @@ public class StorageClient {
     private String password = "Welc0me1#";
     private String uri = "https://Storage-dea2325c3b1f45f2b9c8861188087b23.dv1.opcstorage.com/v1/Storage-dea2325c3b1f45f2b9c8861188087b23/_apaas";
 
+    public StorageClient(String username, String password, String uri) {
+        this.username = username;
+        this.password = password;
+        this.uri = uri;
+    }
+
     public String pushFileToStorage(File file) {
         System.out.println("File Path :" +file.getAbsolutePath());
         System.out.println("File Name :" +file.getName());

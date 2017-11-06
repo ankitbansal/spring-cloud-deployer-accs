@@ -17,9 +17,13 @@ import java.util.Map;
 
 public class ACCSAppDeployer implements AppDeployer {
     private RuntimeEnvironmentInfo runtimeEnvironmentInfo;
+    private StorageClient storageClient;
+    private ACCSClient accsClient;
 
-    public ACCSAppDeployer(RuntimeEnvironmentInfo runtimeEnvironmentInfo) {
+    public ACCSAppDeployer(RuntimeEnvironmentInfo runtimeEnvironmentInfo, ACCSClient accsClient, StorageClient storageClient) {
         this.runtimeEnvironmentInfo = runtimeEnvironmentInfo;
+        this.accsClient = accsClient;
+        this.storageClient = storageClient;
     }
 
     public String deploy(AppDeploymentRequest appDeploymentRequest) {
@@ -41,8 +45,7 @@ public class ACCSAppDeployer implements AppDeployer {
 
     public AppStatus status(String deploymentId) {
         String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
-        ACCSClient client = new ACCSClient();
-        ApplicationStatus application = client.getApplication(appName);
+        ApplicationStatus application = accsClient.getApplication(appName);
         if(application == null) {
             return AppStatus.of(deploymentId).generalState(DeploymentState.failed).build();
         }
@@ -76,12 +79,9 @@ public class ACCSAppDeployer implements AppDeployer {
 
             File zipFile = ACCSUtil.convertToZipFile(file, command);
             System.out.println("Created zip file : " +zipFile.getAbsolutePath());
-            StorageClient storageClient = new StorageClient();
             storageClient.pushFileToStorage(zipFile);
             Application application = appBuilder.getApplicationData(zipFile.getName());
-
-            ACCSClient client = new ACCSClient();
-            client.createApplication(application);
+            accsClient.createApplication(application);
         }
     }
 

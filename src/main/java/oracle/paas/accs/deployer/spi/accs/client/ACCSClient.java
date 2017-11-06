@@ -23,11 +23,18 @@ import java.io.InputStream;
 import static oracle.paas.accs.deployer.spi.util.GsonUtil.gson;
 
 public class ACCSClient {
-    private final static String username = "ramya.paruchuri@oracle.com";
-    private final static String password = "Welc0me1#";
-    private final static String identityDomain = "idcs-eedbb1bbfac84ec090e78e5b1079daab";
-//    private final static String identityDomain = "invalid";
-    public final static String uri="https://psm.aucom-east-1.c9qa132.oc9qadev.com/paas/service/apaas/api/v1.1/apps";
+    private String username;
+    private String password;
+    private String identityDomain;
+    private String uri;
+
+    public ACCSClient(String username, String password, String identityDomain, String uri) {
+
+        this.username = username;
+        this.password = password;
+        this.identityDomain = identityDomain;
+        this.uri = uri;
+    }
 
     public void createApplication(Application application) {
         System.out.println("Inside createApplication");
