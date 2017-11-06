@@ -57,9 +57,20 @@ public class ACCSAutoConfiguration {
     }
 
     private StorageClient storageClient() {
+        String username = null;
+        String password = null;
         if(System.getenv("ACCS_STORAGE_URI") != null) {
-            String username = System.getenv("ACCS_USERNAME");
-            String password = System.getenv("ACCS_PASSWORD");
+            if(System.getenv("ACCS_STORAGE_USERNAME") != null) {
+                username = System.getenv("ACCS_STORAGE_USERNAME");
+            }else {
+                username = System.getenv("ACCS_USERNAME");
+            }
+
+            if(System.getenv("ACCS_STORAGE_PASSWORD") != null) {
+                password = System.getenv("ACCS_STORAGE_PASSWORD");
+            }else {
+                password = System.getenv("ACCS_PASSWORD");
+            }
             String url = System.getenv("ACCS_STORAGE_URI");
             return new StorageClient(username, password, url);
 
