@@ -1,6 +1,8 @@
-package oracle.paas.accs.deployer.spi.client;
+package oracle.paas.accs.deployer.spi.accs.client;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import oracle.paas.accs.deployer.spi.accs.model.Application;
+import oracle.paas.accs.deployer.spi.accs.model.ApplicationStatus;
 import oracle.paas.accs.deployer.spi.util.GsonUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;

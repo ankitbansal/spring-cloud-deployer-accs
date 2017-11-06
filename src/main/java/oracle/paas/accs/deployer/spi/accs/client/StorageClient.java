@@ -1,4 +1,4 @@
-package oracle.paas.accs.deployer.spi.client;
+package oracle.paas.accs.deployer.spi.accs.client;
 
 import org.apache.commons.codec.binary.Base64;
 import org.glassfish.jersey.client.ClientConfig;

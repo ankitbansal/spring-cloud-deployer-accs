@@ -2,7 +2,7 @@ package oracle.paas.accs.deployer.spi.util;
 
 import oracle.paas.accs.deployer.spi.app.ACCSAppDeployer;
 import oracle.paas.accs.deployer.spi.app.ACCSTaskLauncher;
-import oracle.paas.accs.deployer.spi.client.ACCSInfo;
+import oracle.paas.accs.deployer.spi.accs.client.ACCSInfo;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

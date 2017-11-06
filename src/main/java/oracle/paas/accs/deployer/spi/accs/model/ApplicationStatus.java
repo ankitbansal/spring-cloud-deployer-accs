@@ -1,4 +1,4 @@
-package oracle.paas.accs.deployer.spi.client;
+package oracle.paas.accs.deployer.spi.accs.model;
 
 public class ApplicationStatus {
     private String identityDomain;

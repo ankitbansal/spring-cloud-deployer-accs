@@ -1,4 +1,4 @@
-package oracle.paas.accs.deployer.spi.client;
+package oracle.paas.accs.deployer.spi.accs.client;
 
 public class ACCSInfo {
     private String platformType = "ACCS";

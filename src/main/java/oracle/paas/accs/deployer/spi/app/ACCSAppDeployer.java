@@ -1,10 +1,10 @@
 package oracle.paas.accs.deployer.spi.app;
 
-import oracle.paas.accs.deployer.spi.client.ACCSClient;
-import oracle.paas.accs.deployer.spi.client.Application;
-import oracle.paas.accs.deployer.spi.client.ApplicationStatus;
-import oracle.paas.accs.deployer.spi.client.StorageClient;
-import oracle.paas.accs.deployer.spi.util.ACCSUtil;
+import oracle.paas.accs.deployer.spi.accs.client.ACCSClient;
+import oracle.paas.accs.deployer.spi.accs.client.StorageClient;
+import oracle.paas.accs.deployer.spi.accs.model.Application;
+import oracle.paas.accs.deployer.spi.accs.model.ApplicationStatus;
+import oracle.paas.accs.deployer.spi.accs.util.ACCSUtil;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.app.AppStatus;
 import org.springframework.cloud.deployer.spi.app.DeploymentState;
@@ -13,7 +13,6 @@ import org.springframework.cloud.deployer.spi.core.RuntimeEnvironmentInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ACCSAppDeployer implements AppDeployer {

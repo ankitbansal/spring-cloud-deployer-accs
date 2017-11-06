@@ -1,4 +1,4 @@
-package oracle.paas.accs.deployer.spi.util;
+package oracle.paas.accs.deployer.spi.accs.util;
 
 import org.apache.commons.io.FileUtils;
 
