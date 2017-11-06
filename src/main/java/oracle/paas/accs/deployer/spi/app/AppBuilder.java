@@ -112,6 +112,9 @@ public class AppBuilder {
         if(accsProperties.get("app.accs.manifest.type") != null) {
             manifest.setType(accsProperties.get("app.accs.manifest.type"));
         }
+        if(accsProperties.get("app.accs.manifest.startupTime") != null) {
+            manifest.setStartupTime(Integer.parseInt(accsProperties.get("app.accs.manifest.startupTime")));
+        }
         manifest.setCommand("sh " + ACCSUtil.APP_RUNNER);
         return manifest;
     }

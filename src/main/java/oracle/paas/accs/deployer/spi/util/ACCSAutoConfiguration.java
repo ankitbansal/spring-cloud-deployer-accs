@@ -65,9 +65,9 @@ public class ACCSAutoConfiguration {
 
         }
         throw new RuntimeException(("Storage Properties not correctly configured. "));
-        //        private String username = "ramya.paruchuri@oracle.com";
-//        private String password = "Welc0me1#";
-//        private String uri = "https://Storage-dea2325c3b1f45f2b9c8861188087b23.dv1.opcstorage.com/v1/Storage-dea2325c3b1f45f2b9c8861188087b23/_apaas";
+//        String username = "ramya.paruchuri@oracle.com";
+//        String password = "Welc0me1#";
+//        String url = "https://Storage-dea2325c3b1f45f2b9c8861188087b23.dv1.opcstorage.com/v1/Storage-dea2325c3b1f45f2b9c8861188087b23/_apaas";
 //        return new StorageClient(username, password, url);
 
     }
