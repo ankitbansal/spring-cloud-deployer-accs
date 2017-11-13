@@ -39,15 +39,16 @@ public class ACCSAppDeployer implements AppDeployer {
         return deploymentId;
     }
 
-    public void undeploy(String s) {
-
+    public void undeploy(String deploymentId) {
+        String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
+        accsClient.deleteApplication(appName);
     }
 
     public AppStatus status(String deploymentId) {
         String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
         ApplicationStatus application = accsClient.getApplication(appName);
         if(application == null) {
-            return AppStatus.of(deploymentId).generalState(DeploymentState.failed).build();
+            return AppStatus.of(deploymentId).generalState(DeploymentState.undeployed).build();
         }
 
         if(application.getCurrentOngoingActivity() != null) {

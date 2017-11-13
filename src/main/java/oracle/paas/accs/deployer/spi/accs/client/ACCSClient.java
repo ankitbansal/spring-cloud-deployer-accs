@@ -93,7 +93,7 @@ public class ACCSClient {
     }
 
     public ApplicationStatus getApplication(String appName) {
-        System.out.println("Inside getApplcation : " +appName);
+        System.out.println("Inside getApplication : " +appName);
         Client client = getClient();
         Response response = null;
 
@@ -113,6 +113,19 @@ public class ACCSClient {
             return GsonUtil.gson().fromJson(output, ApplicationStatus.class);
         }
         return null;
+    }
+
+    public void deleteApplication(String appName) {
+        System.out.println("Inside deleteApplication : " +appName);
+        Client client = getClient();
+        Response response = null;
+        WebTarget webTarget = client.target(uri + "/" + identityDomain + "/" + appName);
+        response = webTarget.request(MediaType.APPLICATION_JSON_TYPE)
+                .header("Authorization", authHeader())
+                .header("X-ID-TENANT-NAME", identityDomain)
+                .delete(Response.class);
+        System.out.println(response.getStatus() + " "
+                + response.getStatusInfo() + " " + response);
     }
 
     private  String authHeader() {
