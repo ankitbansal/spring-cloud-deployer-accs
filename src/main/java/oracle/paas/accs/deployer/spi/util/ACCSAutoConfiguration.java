@@ -47,13 +47,6 @@ public class ACCSAutoConfiguration {
 
         }
         throw new RuntimeException("ACCS Properties not correctly configured. ");
-
-
-//            String username = "ramya.paruchuri@oracle.com";;
-//            String password = "Welc0me1#";;
-//            String url = "https://psm.aucom-east-1.c9qa132.oc9qadev.com/paas/service/apaas/api/v1.1/apps";;
-//            String identityDomain = "idcs-eedbb1bbfac84ec090e78e5b1079daab";
-//        return new ACCSClient(username, password, identityDomain, url);
     }
 
     private StorageClient storageClient() {
@@ -76,10 +69,6 @@ public class ACCSAutoConfiguration {
 
         }
         throw new RuntimeException(("Storage Properties not correctly configured. "));
-//        String username = "ramya.paruchuri@oracle.com";
-//        String password = "Welc0me1#";
-//        String url = "https://Storage-dea2325c3b1f45f2b9c8861188087b23.dv1.opcstorage.com/v1/Storage-dea2325c3b1f45f2b9c8861188087b23/_apaas";
-//        return new StorageClient(username, password, url);
 
     }
 
