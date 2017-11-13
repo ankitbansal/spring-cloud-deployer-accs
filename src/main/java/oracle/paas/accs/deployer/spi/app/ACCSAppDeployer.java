@@ -32,8 +32,11 @@ public class ACCSAppDeployer implements AppDeployer {
         String deploymentId = deploymentId(appDeploymentRequest);
         System.out.println(String.format("deploy: Getting Status for Deployment Id = {%s}", deploymentId));
 
-        deployApplication(appDeploymentRequest, deploymentId);
-
+        try {
+            deployApplication(appDeploymentRequest, deploymentId);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to deploy application. " + e.getMessage());
+        }
 
         System.out.println(String.format("Exiting deploy().  Deployment Id = {%s}", deploymentId));
         return deploymentId;
@@ -41,7 +44,11 @@ public class ACCSAppDeployer implements AppDeployer {
 
     public void undeploy(String deploymentId) {
         String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
-        accsClient.deleteApplication(appName);
+        try {
+            accsClient.deleteApplication(appName);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to undeploy application. " + e.getMessage());
+        }
     }
 
     public AppStatus status(String deploymentId) {

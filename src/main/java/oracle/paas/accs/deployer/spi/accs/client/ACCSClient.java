@@ -74,13 +74,18 @@ public class ACCSClient {
                     + response.getStatusInfo() + " " + response);
             if (!response.getStatusInfo().toString().equals(Response.Status.ACCEPTED.toString())) {
                 String outputString = response.readEntity(String.class);
-                System.out.println("Post Application provisioning failed with status: " +
-                        response.getStatusInfo() +
-                        " and message: " + outputString);
+                FailedResponse failedResponse =
+                        GsonUtil.gson().fromJson(outputString, FailedResponse.class);
+                if (failedResponse.getDetails() != null &&
+                        failedResponse.getDetails().getMessage() != null) {
+                    throw new RuntimeException(failedResponse.getDetails().getMessage());
+                } else {
+                    throw new RuntimeException("Post Application provisioning failed with status: " +
+                        response.getStatusInfo());
+                }
             }
         } catch (Exception je) {
             System.out.println("Application creation failed :" + je.getMessage());
-            je.printStackTrace();
             throw new RuntimeException(je);
         } finally {
             try {
@@ -124,8 +129,19 @@ public class ACCSClient {
                 .header("Authorization", authHeader())
                 .header("X-ID-TENANT-NAME", identityDomain)
                 .delete(Response.class);
-        System.out.println(response.getStatus() + " "
-                + response.getStatusInfo() + " " + response);
+        if (!response.getStatusInfo().toString().equals(Response.Status.OK.toString()) &&
+                !response.getStatusInfo().toString().equals(Response.Status.ACCEPTED.toString())) {
+            String outputString = response.readEntity(String.class);
+            FailedResponse failedResponse =
+                    GsonUtil.gson().fromJson(outputString, FailedResponse.class);
+            if (failedResponse.getDetails() != null &&
+                    failedResponse.getDetails().getMessage() != null) {
+                throw new RuntimeException(failedResponse.getDetails().getMessage());
+            } else {
+                throw new RuntimeException("Delete Application failed with status: " +
+                        response.getStatusInfo());
+            }
+        }
     }
 
     private  String authHeader() {
@@ -136,9 +152,46 @@ public class ACCSClient {
     private Client getClient() {
         final ClientConfig config = new ClientConfig().register(JacksonJsonProvider.class);
         Client client = ClientBuilder.newClient(config).register(MultiPartFeature.class);
-
-//        config.connectorProvider(new ApacheConnectorProvider());
-//        config.property(ClientProperties.PROXY_URI, "http://www-proxy.us.oracle.com:80");
         return client;
     }
+
+    public static class FailedResponse {
+        public FailedResponse() {
+            super();
+        }
+
+        private String status;
+        private Details details;
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setDetails(FailedResponse.Details details) {
+            this.details = details;
+        }
+
+        public FailedResponse.Details getDetails() {
+            return details;
+        }
+
+        public static class Details {
+            private String message;
+
+            public void setMessage(String message) {
+                this.message = message;
+            }
+
+            public String getMessage() {
+                return message;
+            }
+        }
+
+    }
+
+
 }
