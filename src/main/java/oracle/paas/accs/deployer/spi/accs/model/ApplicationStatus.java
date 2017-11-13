@@ -8,6 +8,7 @@ public class ApplicationStatus {
     private String currentOngoingActivity;
     private String webURL;
     private String[] message;
+    private LastestDeployment lastestDeployment;
 
     public String getIdentityDomain() {
         return identityDomain;
@@ -63,5 +64,46 @@ public class ApplicationStatus {
 
     public void setMessage(String[] message) {
         this.message = message;
+    }
+
+    public LastestDeployment getLastestDeployment() {
+        return lastestDeployment;
+    }
+
+    public void setLastestDeployment(LastestDeployment lastestDeployment) {
+        this.lastestDeployment = lastestDeployment;
+    }
+
+    public boolean isLastDeploymentFailed() {
+        if(this.getLastestDeployment() == null || this.getLastestDeployment().getDeploymentStatus() == null) {
+            return false;
+        }
+        String deploymentStatus = this.getLastestDeployment().getDeploymentStatus();
+        if(!deploymentStatus.equalsIgnoreCase("ERROR") && !deploymentStatus.equalsIgnoreCase("FAILED")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static class LastestDeployment {
+        private String deploymentId;
+        private String deploymentStatus;
+
+        public String getDeploymentId() {
+            return deploymentId;
+        }
+
+        public void setDeploymentId(String deploymentId) {
+            this.deploymentId = deploymentId;
+        }
+
+        public String getDeploymentStatus() {
+            return deploymentStatus;
+        }
+
+        public void setDeploymentStatus(String deploymentStatus) {
+            this.deploymentStatus = deploymentStatus;
+        }
     }
 }

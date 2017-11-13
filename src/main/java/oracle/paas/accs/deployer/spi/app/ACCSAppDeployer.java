@@ -63,6 +63,9 @@ public class ACCSAppDeployer implements AppDeployer {
         }
 
         if(application.getStatus().equalsIgnoreCase("RUNNING")) {
+            if(application.isLastDeploymentFailed()) {
+                return AppStatus.of(deploymentId).generalState(DeploymentState.failed).build();
+            }
             return AppStatus.of(deploymentId).generalState(DeploymentState.deployed).build();
         }
         return AppStatus.of(deploymentId).generalState(DeploymentState.unknown).build();
