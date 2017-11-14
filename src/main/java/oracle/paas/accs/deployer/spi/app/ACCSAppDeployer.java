@@ -106,24 +106,24 @@ public class ACCSAppDeployer implements AppDeployer {
             AppBuilder appBuilder = new AppBuilder(appDeploymentRequest, deploymentId);
             String command = appBuilder.buildCommand(file.getName());
 
-            File zipFile = ACCSUtil.convertToZipFile(file, command);
-            logger.log(Level.INFO, "Created zip file : " +zipFile.getAbsolutePath());
-            storageClient.pushFileToStorage(zipFile);
-            String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
-            if(!accsClient.applicationExists(appName)) {
-                Application application = appBuilder.getApplicationData(zipFile.getName());
-                accsClient.createApplication(application);
-            } else {
-                Application application = appBuilder.getApplicationData(zipFile.getName());
-                accsClient.updateApplication(application);
-            }
+            File zipFile = null;
             try {
-                if (zipFile.exists()) {
-                    zipFile.delete();
+                zipFile = ACCSUtil.convertToZipFile(file, command);
+                logger.log(Level.INFO, "Created zip file : " +zipFile.getAbsolutePath());
+                storageClient.pushFileToStorage(zipFile);
+                String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
+                if(!accsClient.applicationExists(appName)) {
+                    Application application = appBuilder.getApplicationData(zipFile.getName());
+                    accsClient.createApplication(application);
+                } else {
+                    Application application = appBuilder.getApplicationData(zipFile.getName());
+                    accsClient.updateApplication(application);
                 }
-            } catch (SecurityException se){
-                logger.log(Level.SEVERE, "Failed to delete file : " + zipFile.getAbsolutePath(), se);
+            } catch (Exception se){
+                logger.log(Level.SEVERE, "Exception during file operation: " + zipFile.getAbsolutePath(), se);
             }
+            ACCSUtil.deleteFile(zipFile);
+            ACCSUtil.remainingFiles();
         }
     }
 

@@ -3,6 +3,7 @@ package oracle.paas.accs.deployer.spi.accs.client;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import oracle.paas.accs.deployer.spi.accs.model.Application;
 import oracle.paas.accs.deployer.spi.accs.model.ApplicationStatus;
+import oracle.paas.accs.deployer.spi.accs.util.ACCSUtil;
 import oracle.paas.accs.deployer.spi.util.GsonUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -45,6 +46,8 @@ public class ACCSClient {
         Client client = getClient();
         Response response = null;
         InputStream is = null;
+        File manifestFile = null;
+        File deploymentFile = null;
         try {
             FormDataMultiPart uploadform = new FormDataMultiPart();
             uploadform.field("name", application.getName());
@@ -57,13 +60,13 @@ public class ACCSClient {
             if (application.getManifest() != null) {
                 logger.log(Level.INFO, "Upload manifest.json file");
 
-                File manifestFile = new File("manifest.json");
+                manifestFile = new File(ACCSUtil.MANIFEST_FILE);
                 FileUtils.writeStringToFile(manifestFile, gson().toJson(application.getManifest()));
                 uploadform.bodyPart(new FileDataBodyPart("manifest", manifestFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
             }
             if (application.getDeployment() != null) {
                 logger.log(Level.INFO, "Upload deployment.json file. : " +gson().toJson(application.getDeployment()));
-                File deploymentFile = new File("deployment.json");
+                deploymentFile = new File(ACCSUtil.DEPLOYMENT_FILE);
                 FileUtils.writeStringToFile(deploymentFile, gson().toJson(application.getDeployment()));
                 uploadform.bodyPart(new FileDataBodyPart("deployment", deploymentFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
             }
@@ -92,6 +95,8 @@ public class ACCSClient {
             logger.log(Level.SEVERE, "Application creation failed :", je);
             throw new RuntimeException(je);
         } finally {
+//            ACCSUtil.deleteFile(manifestFile);
+//            ACCSUtil.deleteFile(deploymentFile);
             try {
                 if (is != null)
                     is.close();
@@ -175,6 +180,8 @@ public class ACCSClient {
         Client client = getClient();
         Response response = null;
         InputStream is = null;
+        File manifestFile = null;
+        File deploymentFile = null;
         try {
             FormDataMultiPart uploadform = new FormDataMultiPart();
             uploadform.field("archiveURL", application.getArchiveURL());
@@ -183,13 +190,13 @@ public class ACCSClient {
             if (application.getManifest() != null) {
                 logger.log(Level.INFO, "Upload manifest.json file");
 
-                File manifestFile = new File("manifest.json");
+                manifestFile = new File(ACCSUtil.MANIFEST_FILE);
                 FileUtils.writeStringToFile(manifestFile, gson().toJson(application.getManifest()));
                 uploadform.bodyPart(new FileDataBodyPart("manifest", manifestFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
             }
             if (application.getDeployment() != null) {
                 logger.log(Level.INFO, "Upload deployment.json file. : " + gson().toJson(application.getDeployment()));
-                File deploymentFile = new File("deployment.json");
+                deploymentFile = new File(ACCSUtil.DEPLOYMENT_FILE);
                 FileUtils.writeStringToFile(deploymentFile, gson().toJson(application.getDeployment()));
                 uploadform.bodyPart(new FileDataBodyPart("deployment", deploymentFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
             }
@@ -218,6 +225,8 @@ public class ACCSClient {
             logger.log(Level.SEVERE, "Application updation failed :", je);
             throw new RuntimeException(je);
         } finally {
+//            ACCSUtil.deleteFile(manifestFile);
+//            ACCSUtil.deleteFile(deploymentFile);
             try {
                 if (is != null)
                     is.close();

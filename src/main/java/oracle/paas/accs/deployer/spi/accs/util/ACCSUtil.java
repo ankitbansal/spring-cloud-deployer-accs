@@ -16,6 +16,8 @@ import java.util.zip.ZipOutputStream;
 public class ACCSUtil {
 
     public static final String APP_RUNNER = "appRunner.sh";
+    public static final String MANIFEST_FILE = "manifest.json";
+    public static final String DEPLOYMENT_FILE = "deployment.json";
 
     private static Logger logger = Logger.getLogger(ACCSUtil.class.getName());
 
@@ -29,7 +31,7 @@ public class ACCSUtil {
             String zipName = file.getName().replace(".jar", ".zip");
             try {
 
-                File runnerFile = new File("appRunner.sh");
+                File runnerFile = new File(APP_RUNNER);
                 FileUtils.writeStringToFile(runnerFile, command);
 
                 List<File> filesToZip = new ArrayList<File>();
@@ -70,6 +72,27 @@ public class ACCSUtil {
                 }
             } catch (Exception e) {
             }
+        }
+    }
+    
+    public static void deleteFile (File file) {
+        try {
+            if (file != null && file.exists()) {
+                file.delete();
+            }
+        } catch (SecurityException se){
+            logger.log(Level.SEVERE, "Failed to delete file : " + file.getAbsolutePath(), se);
+        }
+    }
+    
+    
+    public static void remainingFiles () {
+        try {
+            deleteFile(new File(ACCSUtil.APP_RUNNER));
+            deleteFile(new File(ACCSUtil.MANIFEST_FILE));
+            deleteFile(new File(ACCSUtil.DEPLOYMENT_FILE));
+        } catch (Exception se){
+            logger.log(Level.SEVERE, "Exception while deleting comon files ", se);
         }
     }
 }
