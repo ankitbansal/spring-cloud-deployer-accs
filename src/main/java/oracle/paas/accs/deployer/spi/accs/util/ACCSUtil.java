@@ -85,8 +85,7 @@ public class ACCSUtil {
         }
     }
     
-    
-    public static void remainingFiles () {
+    public static void deleteCommonFiles () {
         try {
             deleteFile(new File(ACCSUtil.APP_RUNNER));
             deleteFile(new File(ACCSUtil.MANIFEST_FILE));

@@ -123,7 +123,7 @@ public class ACCSAppDeployer implements AppDeployer {
                 logger.log(Level.SEVERE, "Exception during file operation: " + zipFile.getAbsolutePath(), se);
             }
             ACCSUtil.deleteFile(zipFile);
-            ACCSUtil.remainingFiles();
+            ACCSUtil.deleteCommonFiles();
         }
     }
 
