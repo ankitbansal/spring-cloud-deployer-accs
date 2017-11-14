@@ -107,8 +107,14 @@ public class ACCSAppDeployer implements AppDeployer {
             File zipFile = ACCSUtil.convertToZipFile(file, command);
             System.out.println("Created zip file : " +zipFile.getAbsolutePath());
             storageClient.pushFileToStorage(zipFile);
-            Application application = appBuilder.getApplicationData(zipFile.getName());
-            accsClient.createApplication(application);
+            String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
+            if(!accsClient.applicationExists(appName)) {
+                Application application = appBuilder.getApplicationData(zipFile.getName());
+                accsClient.createApplication(application);
+            } else {
+                Application application = appBuilder.getApplicationData(zipFile.getName());
+                accsClient.updateApplication(application);
+            }
         }
     }
 
