@@ -13,9 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StorageClient {
-    private String username = "ramya.paruchuri@oracle.com";
-    private String password = "Welc0me1#";
-    private String uri = "https://Storage-dea2325c3b1f45f2b9c8861188087b23.dv1.opcstorage.com/v1/Storage-dea2325c3b1f45f2b9c8861188087b23/_apaas";
+    private String username;
+    private String password;
+    private String uri;
 
     private static Logger logger = Logger.getLogger(StorageClient.class.getName());
 
