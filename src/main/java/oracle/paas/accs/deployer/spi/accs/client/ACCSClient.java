@@ -159,6 +159,70 @@ public class ACCSClient {
         return client;
     }
 
+    public boolean applicationExists(String appName) {
+        if(getApplication(appName) == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public void updateApplication(Application application) {
+        System.out.println("Inside updateApplication");
+        Client client = getClient();
+        Response response = null;
+        InputStream is = null;
+        try {
+            FormDataMultiPart uploadform = new FormDataMultiPart();
+            uploadform.field("archiveURL", application.getArchiveURL());
+            uploadform.field("archiveFileName", application.getArchiveFileName());
+
+            if (application.getManifest() != null) {
+                System.out.println("Upload manifest.json file");
+
+                File manifestFile = new File("manifest.json");
+                FileUtils.writeStringToFile(manifestFile, gson().toJson(application.getManifest()));
+                uploadform.bodyPart(new FileDataBodyPart("manifest", manifestFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
+            }
+            if (application.getDeployment() != null) {
+                System.out.println("Upload deployment.json file. : " +gson().toJson(application.getDeployment()));
+                File deploymentFile = new File("deployment.json");
+                FileUtils.writeStringToFile(deploymentFile, gson().toJson(application.getDeployment()));
+                uploadform.bodyPart(new FileDataBodyPart("deployment", deploymentFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
+            }
+
+            WebTarget webTarget = client.target(uri + "/" + identityDomain + "/" + application.getName());
+            response = webTarget.request(MediaType.APPLICATION_JSON_TYPE)
+                    .header("Authorization", authHeader())
+                    .header("X-ID-TENANT-NAME", identityDomain)
+                    .put(Entity.entity(uploadform, MediaType.MULTIPART_FORM_DATA_TYPE), Response.class);
+            System.out.println(response.getStatus() + " "
+                    + response.getStatusInfo() + " " + response);
+            if (!response.getStatusInfo().toString().equals(Response.Status.ACCEPTED.toString()) &&
+                    !response.getStatusInfo().toString().equals(Response.Status.OK.toString())) {
+                String outputString = response.readEntity(String.class);
+                FailedResponse failedResponse =
+                        GsonUtil.gson().fromJson(outputString, FailedResponse.class);
+                if (failedResponse.getDetails() != null &&
+                        failedResponse.getDetails().getMessage() != null) {
+                    throw new RuntimeException(failedResponse.getDetails().getMessage());
+                } else {
+                    throw new RuntimeException("Update failed with status: " +
+                            response.getStatusInfo());
+                }
+            }
+        } catch (Exception je) {
+            System.out.println("Application updation failed :" + je.getMessage());
+            throw new RuntimeException(je);
+        } finally {
+            try {
+                if (is != null)
+                    is.close();
+            } catch (Exception ex) {
+                System.out.println("Exception while cleaning up" + ex.getMessage());
+            }
+        }
+    }
+
     public static class FailedResponse {
         public FailedResponse() {
             super();
