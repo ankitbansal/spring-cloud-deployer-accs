@@ -1,19 +1,22 @@
 package oracle.paas.accs.deployer.spi.app;
 
-import oracle.paas.accs.deployer.spi.accs.client.ACCSClient;
-import oracle.paas.accs.deployer.spi.accs.client.StorageClient;
-import oracle.paas.accs.deployer.spi.accs.model.Application;
-import oracle.paas.accs.deployer.spi.accs.model.ApplicationStatus;
-import oracle.paas.accs.deployer.spi.accs.util.ACCSUtil;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.app.AppStatus;
 import org.springframework.cloud.deployer.spi.app.DeploymentState;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.cloud.deployer.spi.core.RuntimeEnvironmentInfo;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
+import oracle.paas.accs.deployer.spi.accs.client.ACCSClient;
+import oracle.paas.accs.deployer.spi.accs.client.StorageClient;
+import oracle.paas.accs.deployer.spi.accs.model.Application;
+import oracle.paas.accs.deployer.spi.accs.model.ApplicationStatus;
+import oracle.paas.accs.deployer.spi.accs.model.ApplicationStatus.Instances;
+import oracle.paas.accs.deployer.spi.accs.util.ACCSUtil;
 
 public class ACCSAppDeployer implements AppDeployer {
     private RuntimeEnvironmentInfo runtimeEnvironmentInfo;
@@ -54,21 +57,34 @@ public class ACCSAppDeployer implements AppDeployer {
     public AppStatus status(String deploymentId) {
         String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
         ApplicationStatus application = accsClient.getApplication(appName);
-        if(application == null) {
-            return AppStatus.of(deploymentId).generalState(DeploymentState.undeployed).build();
-        }
-
-        if(application.getCurrentOngoingActivity() != null) {
-            return AppStatus.of(deploymentId).generalState(DeploymentState.deploying).build();
-        }
-
-        if(application.getStatus().equalsIgnoreCase("RUNNING")) {
+        DeploymentState state = DeploymentState.unknown;
+        if (application == null) {
+            state = DeploymentState.undeployed;
+        } else if (application.getCurrentOngoingActivity() != null) {
+            state = DeploymentState.deploying;
+        } else if(application.getStatus().equalsIgnoreCase("RUNNING")) {
             if(application.isLastDeploymentFailed()) {
-                return AppStatus.of(deploymentId).generalState(DeploymentState.failed).build();
+                state = DeploymentState.failed;
+            } else {
+                state = DeploymentState.deployed;
             }
-            return AppStatus.of(deploymentId).generalState(DeploymentState.deployed).build();
         }
-        return AppStatus.of(deploymentId).generalState(DeploymentState.unknown).build();
+        AppStatus.Builder builder = AppStatus.of(deploymentId);
+        if (application != null) {
+            Instances[] instances = application.getInstances();
+            if (instances != null) {
+                for (Instances instance : instances) {
+                    Map<String, String> attr = new HashMap<String, String>();
+                    attr.put("state", instance.getStatus());
+                    builder = builder.with(new AppInstanceStatusImpl(instance.getName(), state, attr));
+                }
+            } else {
+                builder = builder.with(new AppInstanceStatusImpl(deploymentId, state, new HashMap<String, String>()));
+            }
+        } else {
+            builder = builder.with(new AppInstanceStatusImpl(deploymentId, state, new HashMap<String, String>()));
+        }
+        return builder.build();
     }
 
     public RuntimeEnvironmentInfo environmentInfo() {
