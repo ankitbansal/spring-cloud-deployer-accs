@@ -111,13 +111,17 @@ public class ACCSClient {
         System.out.println(response.getStatus() + " "
                 + response.getStatusInfo() + " " + response);
         if (!response.getStatusInfo().toString().equals(Response.Status.OK.toString())) {
-            System.out.println("Unable to retrieve app details. Error Response : " + response);
-
+            if(response.getStatusInfo().toString().equals(Response.Status.NOT_FOUND.toString())) {
+                System.out.println("Application doesn't exists");
+                return null;
+            } else {
+                System.out.println("Unable to retrieve app details. Error Response : " + response);
+                throw new RuntimeException("Unable to retrieve app details. Error Response : " + response.getStatus());
+            }
         } else {
             String output = response.readEntity(String.class);
             return GsonUtil.gson().fromJson(output, ApplicationStatus.class);
         }
-        return null;
     }
 
     public void deleteApplication(String appName) {
