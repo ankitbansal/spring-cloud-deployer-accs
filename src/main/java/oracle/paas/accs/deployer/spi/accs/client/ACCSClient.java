@@ -19,6 +19,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static oracle.paas.accs.deployer.spi.util.GsonUtil.gson;
 
@@ -27,6 +29,8 @@ public class ACCSClient {
     private String password;
     private String identityDomain;
     private String uri;
+    private static Logger logger = Logger.getLogger(ACCSClient.class.getName());
+
 
     public ACCSClient(String username, String password, String identityDomain, String uri) {
 
@@ -37,7 +41,7 @@ public class ACCSClient {
     }
 
     public void createApplication(Application application) {
-        System.out.println("Inside createApplication");
+        logger.log(Level.INFO, "Inside createApplication");
         Client client = getClient();
         Response response = null;
         InputStream is = null;
@@ -51,14 +55,14 @@ public class ACCSClient {
             uploadform.field("archiveFileName", application.getArchiveFileName());
 
             if (application.getManifest() != null) {
-                System.out.println("Upload manifest.json file");
+                logger.log(Level.INFO, "Upload manifest.json file");
 
                 File manifestFile = new File("manifest.json");
                 FileUtils.writeStringToFile(manifestFile, gson().toJson(application.getManifest()));
                 uploadform.bodyPart(new FileDataBodyPart("manifest", manifestFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
             }
             if (application.getDeployment() != null) {
-                System.out.println("Upload deployment.json file. : " +gson().toJson(application.getDeployment()));
+                logger.log(Level.INFO, "Upload deployment.json file. : " +gson().toJson(application.getDeployment()));
                 File deploymentFile = new File("deployment.json");
                 FileUtils.writeStringToFile(deploymentFile, gson().toJson(application.getDeployment()));
                 uploadform.bodyPart(new FileDataBodyPart("deployment", deploymentFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
@@ -70,7 +74,7 @@ public class ACCSClient {
                     .header("Authorization", authHeader())
                     .header("X-ID-TENANT-NAME", identityDomain)
                     .post(Entity.entity(uploadform, MediaType.MULTIPART_FORM_DATA_TYPE), Response.class);
-            System.out.println(response.getStatus() + " "
+            logger.log(Level.INFO, response.getStatus() + " "
                     + response.getStatusInfo() + " " + response);
             if (!response.getStatusInfo().toString().equals(Response.Status.ACCEPTED.toString())) {
                 String outputString = response.readEntity(String.class);
@@ -85,20 +89,20 @@ public class ACCSClient {
                 }
             }
         } catch (Exception je) {
-            System.out.println("Application creation failed :" + je.getMessage());
+            logger.log(Level.SEVERE, "Application creation failed :", je);
             throw new RuntimeException(je);
         } finally {
             try {
                 if (is != null)
                     is.close();
             } catch (Exception ex) {
-                System.out.println("Exception while cleaning up" + ex.getMessage());
+                logger.log(Level.SEVERE, "Exception while cleaning up", ex);
             }
         }
     }
 
     public ApplicationStatus getApplication(String appName) {
-        System.out.println("Inside getApplication : " +appName);
+        logger.log(Level.INFO, "Inside getApplication : " + appName);
         Client client = getClient();
         Response response = null;
 
@@ -107,15 +111,15 @@ public class ACCSClient {
                 .header("Authorization", authHeader())
                 .header("X-ID-TENANT-NAME", identityDomain)
                 .get(Response.class);
-
-        System.out.println(response.getStatus() + " "
+        
+        logger.log(Level.INFO, response.getStatus() + " "
                 + response.getStatusInfo() + " " + response);
         if (!response.getStatusInfo().toString().equals(Response.Status.OK.toString())) {
             if(response.getStatusInfo().toString().equals(Response.Status.NOT_FOUND.toString())) {
-                System.out.println("Application doesn't exists");
+                logger.log(Level.WARNING, "Application doesn't exists");
                 return null;
             } else {
-                System.out.println("Unable to retrieve app details. Error Response : " + response);
+                logger.log(Level.WARNING, "Unable to retrieve app details. Error Response : " + response);
                 throw new RuntimeException("Unable to retrieve app details. Error Response : " + response.getStatus());
             }
         } else {
@@ -125,7 +129,7 @@ public class ACCSClient {
     }
 
     public void deleteApplication(String appName) {
-        System.out.println("Inside deleteApplication : " +appName);
+        logger.log(Level.INFO, "Inside deleteApplication : " + appName);
         Client client = getClient();
         Response response = null;
         WebTarget webTarget = client.target(uri + "/" + identityDomain + "/" + appName);
@@ -167,7 +171,7 @@ public class ACCSClient {
     }
 
     public void updateApplication(Application application) {
-        System.out.println("Inside updateApplication");
+        logger.log(Level.INFO, "Inside updateApplication");
         Client client = getClient();
         Response response = null;
         InputStream is = null;
@@ -177,14 +181,14 @@ public class ACCSClient {
             uploadform.field("archiveFileName", application.getArchiveFileName());
 
             if (application.getManifest() != null) {
-                System.out.println("Upload manifest.json file");
+                logger.log(Level.INFO, "Upload manifest.json file");
 
                 File manifestFile = new File("manifest.json");
                 FileUtils.writeStringToFile(manifestFile, gson().toJson(application.getManifest()));
                 uploadform.bodyPart(new FileDataBodyPart("manifest", manifestFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
             }
             if (application.getDeployment() != null) {
-                System.out.println("Upload deployment.json file. : " +gson().toJson(application.getDeployment()));
+                logger.log(Level.INFO, "Upload deployment.json file. : " + gson().toJson(application.getDeployment()));
                 File deploymentFile = new File("deployment.json");
                 FileUtils.writeStringToFile(deploymentFile, gson().toJson(application.getDeployment()));
                 uploadform.bodyPart(new FileDataBodyPart("deployment", deploymentFile, MediaType.APPLICATION_OCTET_STREAM_TYPE));
@@ -195,7 +199,7 @@ public class ACCSClient {
                     .header("Authorization", authHeader())
                     .header("X-ID-TENANT-NAME", identityDomain)
                     .put(Entity.entity(uploadform, MediaType.MULTIPART_FORM_DATA_TYPE), Response.class);
-            System.out.println(response.getStatus() + " "
+            logger.log(Level.INFO, response.getStatus() + " "
                     + response.getStatusInfo() + " " + response);
             if (!response.getStatusInfo().toString().equals(Response.Status.ACCEPTED.toString()) &&
                     !response.getStatusInfo().toString().equals(Response.Status.OK.toString())) {
@@ -211,14 +215,14 @@ public class ACCSClient {
                 }
             }
         } catch (Exception je) {
-            System.out.println("Application updation failed :" + je.getMessage());
+            logger.log(Level.SEVERE, "Application updation failed :", je);
             throw new RuntimeException(je);
         } finally {
             try {
                 if (is != null)
                     is.close();
             } catch (Exception ex) {
-                System.out.println("Exception while cleaning up" + ex.getMessage());
+                logger.log(Level.SEVERE, "Exception while cleaning up ", ex);
             }
         }
     }

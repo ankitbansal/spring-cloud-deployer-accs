@@ -2,17 +2,22 @@ package oracle.paas.accs.deployer.spi.accs.util;
 
 import org.apache.commons.io.FileUtils;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ACCSUtil {
 
     public static final String APP_RUNNER = "appRunner.sh";
+
+    private static Logger logger = Logger.getLogger(ACCSUtil.class.getName());
 
     public static String getSanitizedApplicationName(String name) {
        return name.replaceAll("[^A-Za-z0-9]", "");
@@ -32,7 +37,7 @@ public class ACCSUtil {
                 filesToZip.add(runnerFile);
                 zipFiles(filesToZip, zipName);
             } catch(Exception e) {
-                System.out.println("Unable to create zip : " +e.getMessage());
+                logger.log(Level.SEVERE, "Unable to create zip :", e);
                 throw new RuntimeException(e);
             }
             return new File(zipName);
@@ -55,6 +60,7 @@ public class ACCSUtil {
                 }
 
                 zos.closeEntry();
+                fis.close();
             }
         }finally {
             try {

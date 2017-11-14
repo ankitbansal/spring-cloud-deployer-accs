@@ -1,10 +1,4 @@
 package oracle.paas.accs.deployer.spi.accs.model;
-import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Application {
     private String name;

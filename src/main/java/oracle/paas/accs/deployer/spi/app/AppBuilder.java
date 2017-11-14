@@ -12,6 +12,8 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +31,8 @@ public class AppBuilder {
     private AppDeploymentRequest appDeploymentRequest;
     private String deploymentId;
     private Map<String, String> appDefinitionProperties = new HashMap<String, String>();
+
+    private static Logger logger = Logger.getLogger(AppBuilder.class.getName());
 
     public AppBuilder(AppDeploymentRequest appDeploymentRequest, String deploymentId) {
 
@@ -88,7 +92,7 @@ public class AppBuilder {
             }.getType();
             return GsonUtil.gson().fromJson(envVariables, type);
         } catch (Exception e ) {
-            System.out.println("unable to parse env variables " + e.getMessage());
+            logger.log(Level.SEVERE, "unable to parse env variables ", e);
             e.printStackTrace();
         }
 
@@ -100,7 +104,7 @@ public class AppBuilder {
             Type type = new TypeToken<List<ServiceBinding>>() {}.getType();
             return GsonUtil.gson().fromJson(serviceBindings, type);
         }catch (Exception e ) {
-            System.out.println("unable to parse service bindings " + e.getMessage());
+            logger.log(Level.SEVERE, "unable to parse service bindings", e);
             e.printStackTrace();
         }
 
@@ -145,7 +149,7 @@ public class AppBuilder {
         addDefinitionProperties(commands);
         addDeploymentProperties(commands);
         commands.addAll(appDeploymentRequest.getCommandlineArguments());
-        System.out.println("Java Command = " + StringUtils.collectionToDelimitedString(commands, " "));
+        logger.log(Level.INFO, "Java Command = " + StringUtils.collectionToDelimitedString(commands, " "));
         return StringUtils.collectionToDelimitedString(commands, " ");
     }
 
@@ -159,7 +163,6 @@ public class AppBuilder {
 
     private static void addToCommand(List<String> commands, Map<String, String> args, String prop) {
         if(isDynamicValue(args, prop)) {
-
             commands.add(String.format("--%s=%s", prop, replaceDynamicValue(args, prop)));
         } else {
             commands.add(String.format("--%s=%s", prop, args.get(prop)));
@@ -174,7 +177,7 @@ public class AppBuilder {
         int count=1;
         while(matcher.find()) {
             String match = matcher.group(count);
-            System.out.println("Match : " +match);
+            logger.log(Level.INFO, "Match : " + match);
             if(args.get(match) != null) {
                 value = value.replace("${"  + match + "}", args.get(match));
             } else {
@@ -182,7 +185,7 @@ public class AppBuilder {
             }
             count++;
         }
-        System.out.println("Finval value : " +value);
+        logger.log(Level.INFO, "Final value : " + value);
         return value;
     }
 

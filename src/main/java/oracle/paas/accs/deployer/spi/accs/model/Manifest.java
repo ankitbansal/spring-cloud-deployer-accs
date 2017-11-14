@@ -1,7 +1,5 @@
 package oracle.paas.accs.deployer.spi.accs.model;
 
-import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
-
 public class Manifest {
     private String command;
     private String type = "web";

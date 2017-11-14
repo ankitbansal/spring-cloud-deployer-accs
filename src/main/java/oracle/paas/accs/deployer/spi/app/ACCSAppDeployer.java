@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.app.AppStatus;
@@ -22,6 +24,7 @@ public class ACCSAppDeployer implements AppDeployer {
     private RuntimeEnvironmentInfo runtimeEnvironmentInfo;
     private StorageClient storageClient;
     private ACCSClient accsClient;
+    private static Logger logger = Logger.getLogger(ACCSAppDeployer.class.getName());
 
     public ACCSAppDeployer(RuntimeEnvironmentInfo runtimeEnvironmentInfo, ACCSClient accsClient, StorageClient storageClient) {
         this.runtimeEnvironmentInfo = runtimeEnvironmentInfo;
@@ -30,18 +33,18 @@ public class ACCSAppDeployer implements AppDeployer {
     }
 
     public String deploy(AppDeploymentRequest appDeploymentRequest) {
-        System.out.println(String.format("Entered deploy: Deploying AppDeploymentRequest: AppDefinition = {%s}, Resource = {%s}, Deployment Properties = {%s}",
+        logger.log(Level.INFO, String.format("Entered deploy: Deploying AppDeploymentRequest: AppDefinition = {%s}, Resource = {%s}, Deployment Properties = {%s}",
                 appDeploymentRequest.getDefinition(), appDeploymentRequest.getResource(), appDeploymentRequest.getDeploymentProperties()));
+
         String deploymentId = deploymentId(appDeploymentRequest);
-        System.out.println(String.format("deploy: Getting Status for Deployment Id = {%s}", deploymentId));
+        logger.log(Level.INFO, String.format("deploy: Getting Status for Deployment Id = {%s}", deploymentId));
 
         try {
             deployApplication(appDeploymentRequest, deploymentId);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to deploy application. " + e.getMessage());
         }
-
-        System.out.println(String.format("Exiting deploy().  Deployment Id = {%s}", deploymentId));
+        logger.log(Level.INFO, String.format("Exiting deploy().  Deployment Id = {%s}", deploymentId));
         return deploymentId;
     }
 
@@ -74,7 +77,7 @@ public class ACCSAppDeployer implements AppDeployer {
             Instances[] instances = application.getInstances();
             if (instances != null) {
                 for (Instances instance : instances) {
-                    Map<String, String> attr = new HashMap<String, String>();
+                    Map<String, String> attr = new HashMap<>();
                     attr.put("state", instance.getStatus());
                     builder = builder.with(new AppInstanceStatusImpl(instance.getName(), state, attr));
                 }
@@ -96,8 +99,7 @@ public class ACCSAppDeployer implements AppDeployer {
         try {
             file = appDeploymentRequest.getResource().getFile();
         } catch (IOException e) {
-            System.out.println("Exception while retrieving file " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Exception while retrieving file", e);
         }
 
         if(file != null) {
@@ -105,7 +107,7 @@ public class ACCSAppDeployer implements AppDeployer {
             String command = appBuilder.buildCommand(file.getName());
 
             File zipFile = ACCSUtil.convertToZipFile(file, command);
-            System.out.println("Created zip file : " +zipFile.getAbsolutePath());
+            logger.log(Level.INFO, "Created zip file : " +zipFile.getAbsolutePath());
             storageClient.pushFileToStorage(zipFile);
             String appName = ACCSUtil.getSanitizedApplicationName(deploymentId);
             if(!accsClient.applicationExists(appName)) {
@@ -114,6 +116,13 @@ public class ACCSAppDeployer implements AppDeployer {
             } else {
                 Application application = appBuilder.getApplicationData(zipFile.getName());
                 accsClient.updateApplication(application);
+            }
+            try {
+                if (zipFile.exists()) {
+                    zipFile.delete();
+                }
+            } catch (SecurityException se){
+                logger.log(Level.SEVERE, "Failed to delete file : " + zipFile.getAbsolutePath(), se);
             }
         }
     }
