@@ -84,7 +84,7 @@ public class ACCSAppDeployer implements AppDeployer {
                 state = DeploymentState.deployed;
             }
         }
-        AppStatus.Builder builder = AppStatus.of(deploymentId);
+        AppStatus.Builder builder = AppStatus.of(appName);
         if (application != null) {
             Instances[] instances = application.getInstances();
             if (instances != null) {
