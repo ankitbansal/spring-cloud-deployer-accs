@@ -22,7 +22,7 @@ import org.springframework.core.Ordered;
 public class ACCSAutoConfiguration {
 
     private RuntimeEnvironmentInfo runtime(Class spiClass, Class implementationClass) {
-        ACCSInfo client = new ACCSInfo();
+        ACCSInfo client = ACCSInfo.getInstance();
         return new RuntimeEnvironmentInfo.Builder()
                 .implementationName(implementationClass.getSimpleName())
                 .spiClass(spiClass)
