@@ -1,10 +1,12 @@
 package oracle.paas.accs.deployer.spi.app;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
@@ -24,7 +26,17 @@ public class ACCSAppDeployer implements AppDeployer {
     private RuntimeEnvironmentInfo runtimeEnvironmentInfo;
     private StorageClient storageClient;
     private ACCSClient accsClient;
+    
+    private static final LogManager logManager = LogManager.getLogManager();
     private static Logger logger = Logger.getLogger(ACCSAppDeployer.class.getName());
+    static{
+        try {
+            logManager.readConfiguration(new FileInputStream("./logging.properties"));
+            logger.log(Level.INFO, "Configered LogManager");
+        } catch (IOException exception) {
+            logger.log(Level.SEVERE, "Error in loading configuration", exception);
+        }
+    }
 
     public ACCSAppDeployer(RuntimeEnvironmentInfo runtimeEnvironmentInfo, ACCSClient accsClient, StorageClient storageClient) {
         this.runtimeEnvironmentInfo = runtimeEnvironmentInfo;
